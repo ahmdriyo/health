@@ -49,10 +49,10 @@ function Main() {
   }
 
   if (initialize) return null;
-  console.log("user")
-  console.log(user)
-  console.log("name")
-  console.log(name)
+  // console.log("user")
+  // console.log(user)
+  // console.log("name")
+  // console.log(name)
   return (
     <Stack.Navigator
       screenOptions={{

@@ -24,6 +24,7 @@ const SignUpUser = ({ navigation }) => {
   const [password, setPassword] = useState();
   const [email, setEmail] = useState();
   const [fullName, setFullName] = useState();
+  const [role, setRole] = useState ("apotekers")
 
   registerUser = async (email, password, fullName) => {
     await firebase
@@ -48,8 +49,10 @@ const SignUpUser = ({ navigation }) => {
                 email,
                 fullName,
                 password,
+                role,
               });
-              navigation.navigate("Login");
+              console.log(email,fullName,password,role)
+              // navigation.navigate("Login");
           })
           .catch((err) => {
             alert(err.message);

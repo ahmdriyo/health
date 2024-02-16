@@ -22,7 +22,7 @@ const SignUpAs = ({navigation}) => {
     Raleway_700Bold,
   });
   if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
+    return 
   }
   return (
     <SafeAreaView style={styles.container}>

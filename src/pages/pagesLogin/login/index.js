@@ -25,14 +25,26 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState();
   const logins = async (email, password) => {
     try {
-      await firebase.auth().signInWithEmailAndPassword(email, password);
-      await AsyncStorage.setItem('userData', JSON.stringify(email));
-      navigation.navigate("HomeUser");
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+      const userData = userCredential.user;
+      // Fetch user role based on email from Firestore
+      const userDoc = await firebase.firestore().collection('users').where('email', '==', email).get();
+      if (!userDoc.empty) {
+        userDoc.forEach(doc => {
+          const userRole = doc.data().role;
+          // Save user role to AsyncStorage
+          AsyncStorage.setItem('userRole', userRole);
+        });
+      }
+      // Save user data to AsyncStorage
+      AsyncStorage.setItem('userData', JSON.stringify(userData));
+      // Navigate user based on their role
+      navigateUserBasedOnRole();
     } catch (err) {
       if (err.message === "Firebase: The supplied auth credential is incorrect, malformed or has expired. (auth/invalid-credential).") {
         Alert.alert(
           "Error",
-          "Email dan password yang Anda masukan salah atau belum terdaftar, Silahkan periksa kembali email yang anda masukkan",
+          "Email dan password yang Anda masukkan salah atau belum terdaftar, Silahkan periksa kembali email yang Anda masukkan",
           [
             {
               text: "OK",
@@ -42,12 +54,45 @@ const Login = ({ navigation }) => {
       }
     }
   };
+
+  const navigateUserBasedOnRole = async () => {
+    try {
+      const userRole = await AsyncStorage.getItem('userRole');
+      if (userRole === 'dokters') {
+        navigation.navigate("HomeDokter");
+      } else if (userRole === 'users') {
+        navigation.navigate("HomeUser");
+      } else if (userRole === 'apotekers') {
+        navigation.navigate("HomeApoteker");
+      } 
+    } catch (error) {
+      console.error('Error navigating user based on role:', error);
+    }
+  };
+  //   try {
+  //     await firebase.auth().signInWithEmailAndPassword(email, password);
+  //     await AsyncStorage.setItem('userData', JSON.stringify(email));
+  //     navigation.navigate("HomeUser");
+  //   } catch (err) {
+  //     if (err.message === "Firebase: The supplied auth credential is incorrect, malformed or has expired. (auth/invalid-credential).") {
+  //       Alert.alert(
+  //         "Error",
+  //         "Email dan password yang Anda masukan salah atau belum terdaftar, Silahkan periksa kembali email yang anda masukkan",
+  //         [
+  //           {
+  //             text: "OK",
+  //           },
+  //         ]
+  //       );
+  //     }
+  //   }
+  // };
   const [fontsLoaded] = useFonts({
     Raleway_600SemiBold,
     Raleway_700Bold,
   });
   if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
+    return 
   }
   return (
     <SafeAreaView style={styles.container}>

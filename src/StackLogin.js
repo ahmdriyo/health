@@ -9,6 +9,8 @@ import Login from './pages/pagesLogin/login';
 import { useEffect, useState } from 'react';
 import {firebase} from '../config';
 import HomeUser from './pages/dashboard/homeUser';
+import HomeDokter from './pages/dashboard/homeDokter';
+import HomeApoteker from './pages/dashboard/homeApoteker';
 const StacksLogin = createStackNavigator();
 
 function StackLogin() {
@@ -75,6 +77,16 @@ function StackLogin() {
     <StacksLogin.Screen
       name="HomeUser"
       component={HomeUser}
+      options={{ headerShown: false }}
+    />
+    <StacksLogin.Screen
+      name="HomeDokter"
+      component={HomeDokter}
+      options={{ headerShown: false }}
+    />
+    <StacksLogin.Screen
+      name="HomeApoteker"
+      component={HomeApoteker}
       options={{ headerShown: false }}
     />
   </StacksLogin.Navigator>
