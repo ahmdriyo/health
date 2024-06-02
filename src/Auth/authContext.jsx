@@ -1,44 +1,54 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut } from "firebase/auth";
 import { doc,getDoc,setDoc } from 'firebase/firestore'
-import { auth,db } from "../../config";
+import { auth,db, userRef } from "../../config";
 
 export const  AuthContext = createContext ();
 export const AuthContextProvider = ({children}) => {
   const [user, setUser] = useState(null)
-  const [isAuthenticated,setIsAuthenticated] = useState(undefined)
+  // const [isAuthenticated,setIsAuthenticated] = useState(undefined)
 
   useEffect(() => {
       const unsub = onAuthStateChanged(auth, (user) => {
-        console.log('got user :' ,user)
-        // if(user) {
-        //   setIsAuthenticated(true);
-        //   setUser(user)
-        //   updateUserData(user.uid);
-        // }else{
-        //   setIsAuthenticated(false)
-        //   setUser(null)
-        // }
+        // console.log('got user :' ,user)
+        if(user) {
+          // setIsAuthenticated(true);
+          setUser(user)
+          updateUserData(user.uid);
+        }else{
+          // setIsAuthenticated(false)
+          setUser(null)
+        }
       })
       return unsub;
+      
   },[])
 
   const updateUserData = async (userId) => {
     const docRef = doc(db, 'users',userId);
-    console.log("docRef",docRef)
     const docSnap = await getDoc(docRef);
-    console.log("docSnap",docSnap)
 
     if(docSnap.exists()) {
       let data = docSnap.data();
-      console.log('data ku',data)
-      setUser({...user, username: data.username, profileUrl: data.profileUrl,userId: data.userId})
+      setUser({...user, fullName: data.fullName,userId: data.userId,role:data.role})
     }
+    // console.log("update",user)
   }
   const login = async (email,password) => {
     try {
       const response = await signInWithEmailAndPassword(auth,email,password);
-      return {success: true}
+      const user = response.user;
+
+    // // Ambil data pengguna dari Firestore
+    const userDocRef = doc(userRef, user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      throw new Error("User data not found");
+    }
+    const userData = userDoc.data();
+    return { success: true, user: userData };
+      // return {success: true}
     } catch (e) {
       let msg = e.message;
       if(msg.includes('(auth/invalid-email)')) msg ="Invalid email";
@@ -56,16 +66,14 @@ export const AuthContextProvider = ({children}) => {
       
     }
   }
-  const register = async (email,password,username) => {
+  const register = async (email,password,fullName,role) => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email,password);
-      // console.log('response user', response?.user)
-
-      // setUser(response?.user);
-      // setIsAuthenticated(true);
 
       await setDoc(doc(db, "users", response?.user?.uid),{
-        username,
+        email,
+        fullName,
+        role,
         userId : response?.user?.uid
       });
       return { success : true, data: response?.user};
@@ -80,7 +88,7 @@ export const AuthContextProvider = ({children}) => {
   }
 
   return (
-    <AuthContext.Provider value={{user,isAuthenticated,login,logout,register}}>
+    <AuthContext.Provider value={{user,login,logout,register}}>
       {children}
     </AuthContext.Provider>
   )

@@ -19,10 +19,20 @@ import Artikel from "./artikel";
 import Beranda from "./beranda";
 import Nontifikasi from "./nontifikasi";
 import Loading from "../../../components/Loading";
+import { useAuth } from "../../../Auth/authContext";
 
 const BottomTabNavigator = createBottomTabNavigator();
+
 const HomeUser = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
+
+  const {logout,user} = useAuth();
+  const [users, setUsers] = useState([''])
+  useEffect(() => {
+    console.log("User cek",user)
+    if(user?.uid)
+    getUsers()
+  },[])
 
   useEffect(() => {
     setTimeout(() => {

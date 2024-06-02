@@ -6,13 +6,11 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { Dimensions, Alert } from "react-native";
 import SvgLogin from "../../../assets/SvgLogin";
-import { firebase, userRef } from "../../../../config";
 import InputPassword from "../../../components/InputPassword";
 import {
   Raleway_600SemiBold,
@@ -22,13 +20,15 @@ import Buttons from "../../../components/Button/Index";
 import TextInputs from "../../../components/TextInput";
 import {
   alertEmailDuplicate,
-  alertRegSuccessful,
   invalidEmailError,
   minimumPasswordError,
   fieldError,
   nameError
 } from "../../../customAlert";
 import LoadingButton from "../../../components/LoadingButton";
+import { useAuth } from "../../../Auth/authContext";
+import { userRef } from "../../../../config";
+import { getDocs, query, where } from "firebase/firestore";
 
 const SignUpUser = ({ navigation }) => {
   const [password, setPassword] = useState();
@@ -36,6 +36,8 @@ const SignUpUser = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState();
   const [role, setRole] = useState("user");
+  const {logout,user,register} = useAuth();
+  const [users, setUsers] = useState([''])
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,28 +62,43 @@ const SignUpUser = ({ navigation }) => {
     }
     setLoading(true)
     try {
-      const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-      const userId = userCredential.user.uid;
-      await userRef.doc(userId).set({
-        email,
-        fullName,
-        role,
-      });
-      setLoading(false)
-      navigation.navigate("Login");
-      alertRegSuccessful();
-      console.log("role anda :", role);
-      console.log("id anda :", userId);
-      console.log("Pendaftaran berhasil:", email, fullName);
-    } catch (err) {
-      setLoading(false)
-      if ( err.message === "Firebase: The email address is already in use by another account. (auth/email-already-in-use).") {
-        alertEmailDuplicate();
-        setLoading(false)
+      let response = await register(email, password, fullName, role);
+      setLoading(false);
+      if (!response.success) {
+        Alert.alert("Sign Up", response.msg);
         return;
+      }
+      await getUsers();
+      console.log("role anda :", role);
+      if (role === "user") {
+        navigation.navigate("HomeUser");
+      }
+
+    } catch (err) {
+      setLoading(false);
+      if (err.message === "Firebase: The email address is already in use by another account. (auth/email-already-in-use).") {
+        alertEmailDuplicate();
+      } else {
+        console.error('Registration error:', err);
       }
     }
   };
+  const getUsers = async () => {
+    try {
+      const q = query(userRef, where('userId', '!=', user?.uid));
+      const querySnapshot = await getDocs(q);
+      let data = [];
+      console.log("query", q);
+      querySnapshot.forEach(doc => {
+        data.push({ ...doc.data() });
+      });
+      setUsers(data);
+      console.log("user", data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+
   const [fontsLoaded] = useFonts({
     Raleway_600SemiBold,
     Raleway_700Bold,
@@ -124,7 +141,9 @@ const SignUpUser = ({ navigation }) => {
             />
           </View>
           {loading ? (
-            <LoadingButton/>
+            <View style={{width: '75%',height : 45,}}>
+              <LoadingButton/>
+            </View>
           ):(
             <Buttons
             label="Sign Up"

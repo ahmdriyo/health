@@ -58,22 +58,22 @@ const Pesan = ({ navigation }) => {
 const {logout,user} = useAuth();
 const [users, setUsers] = useState([''])
 useEffect(() => {
-  console.log("akamak",user)
-  if(user?.uid)
-  getUsers()
-},[])
+  if (user?.userId) {
+    getUsers();
+  }
+  console.log("user data", user);
+}, []);
 
 const getUsers = async () => {
-  const q = query(userRef, where('userId', '!=',user?.uid))
+  const q = query(userRef, where('userId', '!=',user?.userId))
 
   const querySnapshot = await getDocs(q);
   let data = [];
-  // console.log("q",q)
   querySnapshot.forEach(doc => {
     data.push({...doc.data()})
   });
   setUsers(data)
-  console.log("eee",data)
+  console.log("data GetUser",data)
 }
 // const nama = user.username;
 return (

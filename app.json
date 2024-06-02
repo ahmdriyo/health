@@ -20,11 +20,6 @@
     "orientation": "portrait",
     "icon": "./src/assets/Image/Icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./src/assets/Image/Splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],

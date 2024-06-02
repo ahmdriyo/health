@@ -23,11 +23,13 @@ import SvgProfile from "../../../../assets/Image/Icon/Profile";
 import { bgHeader } from "../../../../assets";
 import SvgHeart from "../../../../assets/Image/Icon/SvgHeart";
 import Conten from "./Conten";
-export default function Beranda() {
+import { useAuth } from "../../../../Auth/authContext";
+export default function Beranda () {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [city, setCity] = useState(null);
   const [name, setName] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -58,18 +60,6 @@ export default function Beranda() {
       })();
     }
   }, [location]);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const getData = await AsyncStorage.getItem("userData");
-        const { fullName } = JSON.parse(getData);
-        setName(fullName);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-    fetchUserData();
-  }, []);
 
   let text = (
     <>
@@ -120,7 +110,7 @@ export default function Beranda() {
                   marginRight: 5,
                 }}
               >
-                <Text style={styles.textName}>{name}</Text>
+                <Text style={styles.textName}>{user.fullName}</Text>
                 <Text style={styles.textCity}>{text}</Text>
               </View>
             </View>

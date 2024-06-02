@@ -18,41 +18,46 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import {getRoomId} from "../../../../../utils/cummon"
-import { Timestamp, addDoc, collection, doc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
+import { Timestamp, addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
 import { db } from "../../../../../config";
-const ChatRoom = ({navigation,route}) => {
-  const { item } = route.params; 
-  const {user } = useAuth()
+import { useNavigation, useRoute } from "@react-navigation/native";
+const ChatRoom = () => {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const textRef = useRef('');
-  const inputRef = useRef(null)
-  const scrollViewRef = useRef(null)
+  const inputRef = useRef(null);
+  const scrollViewRef = useRef(null);
+
   const handleGoBack = () => {
-    navigation.goBack()
+    navigation.goBack();
   };
-
   useEffect(() => {
-    createRoomIfNoExists();
-    let roomId = getRoomId(user?.userId, item?.userId);
-    const docRef = doc(db, "rooms", roomId);
-    const messagesRef = collection(docRef, "messages");
-    const q = query(messagesRef, orderBy('createdAt' , 'asc'));
-
-    let unsub = onSnapshot (q, (snapshot) => {
-      let allMessages = snapshot.docs.map(doc => {
-        return doc.data ();
+      createRoomIfNoExists();
+      let roomId = getRoomId(user?.userId, route.params.userId);
+      console.log("UserId:", user?.userId);
+      console.log("router id:", route.params.userId);
+      console.log("room id", roomId);
+      const docRef = doc(db, "rooms", roomId);
+      const messagesRef = collection(docRef, "messages");
+      const q = query(messagesRef, orderBy('createdAt', 'asc'));
+      let unsub = onSnapshot(q, (snapshot) => {
+        let allMessages = snapshot.docs.map(doc => doc.data());
+        setMessages([...allMessages]);
+        updateScrollView();
       });
-      setMessages([...allMessages]);
-      updateScrollView();
-    })
-    const keyboardUp = Keyboard.addListener(
-      "keyboardDidShow",updateScrollView
-    )
-    return () => {
-      unsub();
-      keyboardUp.remove();
-    }
-  },[])
+
+      const keyboardUp = Keyboard.addListener(
+        "keyboardDidShow", updateScrollView
+      );
+
+      return () => {
+        unsub();
+        keyboardUp.remove();
+      };
+    },[user, route.params.userId]);
+
   useEffect(() => {
     updateScrollView()
   },[messages])
@@ -63,45 +68,43 @@ const ChatRoom = ({navigation,route}) => {
     })
   }
   const createRoomIfNoExists = async () => {
-    let roomId = getRoomId(user?.userId, item?.userId);
-    await setDoc(doc(db, "rooms",roomId), {
-      roomId,
-      createdAt: Timestamp.fromDate(new Date())
-    })
-  }
-
+    let roomId = getRoomId(user?.userId, route.params.userId);
+    const docRef = doc(db, "rooms", roomId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      await setDoc(docRef, { createdAt: Timestamp.fromDate(new Date()) });
+    }
+  };
   const handleSendMessage = async () => {
     let message = textRef.current.trim();
-    if(!message) return;
+    if (!message) return;
     try {
-      let roomId = getRoomId(user?.userId, item?.userId);
+      let roomId = getRoomId(user?.userId, route.params.userId);
       const docRef = doc(db, 'rooms', roomId);
       const messagesRef = collection(docRef, "messages");
       textRef.current = "";
-      if(inputRef) inputRef?.current?.clear();
+      if (inputRef.current) inputRef.current.clear();
 
-      const newDoc = await addDoc(messagesRef, {
-        userId : user?.userId,
+      await addDoc(messagesRef, {
+        userId: user?.userId,
         text: message,
-        profileUrl : user?.profileUrl,
-        senderName : user?.username,
-        createdAt : Timestamp.fromDate(new Date())
-      })
+        senderName: user?.fullName,
+        createdAt: Timestamp.fromDate(new Date())
+      });
 
-      // console.log (" New message" , newDoc.id)
     } catch (error) {
-      Alert.alert("message", error.message)
+      Alert.alert("Error", error.message);
     }
-  }
-// console.log("message :" ,messages)
+  };
 
   return (
     <View style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" hidden={false} />
-      <ChatRoomHeader user={item} onBack={handleGoBack} />
+      <Text>eeeeeeeeeee</Text>
+      {/* <ChatRoomHeader user={item} onBack={handleGoBack} /> */}
       <View style={{ flex: 1 }}>
         <View>
-          <MessageList user={item} scrollViewRef={scrollViewRef} messages={messages} currentUser={user}/>
+          <MessageList user={route.params.userId} scrollViewRef={scrollViewRef} messages={messages} currentUser={user}/>
         </View>
         <View style={{ flex: 1 }}>
           <View

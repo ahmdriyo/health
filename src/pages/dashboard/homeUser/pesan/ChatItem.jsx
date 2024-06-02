@@ -12,12 +12,13 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import {getFirestore} from 'firebase/firestore';
 import { db } from "../../../../../config";
+import SvgIconHealth from "../../../../assets/Image/Icon/IconHealth";
+import { icon } from "../../../../assets";
 const ChatItem = ({ item, navigation, currentUser }) => {
   const [lastMessage, setLastMessage] = useState(undefined);
   const openChatRoom = () => {
-    navigation.navigate("ChatRoom", { params: item });
+    navigation.navigate("ChatRoom", {  userId: item.userId });
   };
 
   useEffect(() => {
@@ -69,20 +70,21 @@ const ChatItem = ({ item, navigation, currentUser }) => {
   // console.log("renderLastMessage : ", renderLastMessage());
   // console.log("lastMessage : ", lastMessage);
   // console.log("currentUser : ", currentUser);
-  console.log(item)
+  // console.log("item",item)
   return (
     <TouchableOpacity
       onPress={openChatRoom}
       style={styles.conten}
     >
       <Image
-        source={{ uri: item?.profileUrl }}
+        // source={{ uri: item?.profileUrl }}
+        source={icon}
         style={{ height: 50, width: 50, borderRadius: 33, marginRight: 10, }}
       />
       <View style={{ flex: 1, gap: 1 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text style={{ fontWeight: "bold", fontSize: hp(2) }}>
-            {item?.username}
+            {item?.fullName}
           </Text>
           <Text style={{ fontWeight: "500", fontSize: hp(2) }}>
             {renderTime()}

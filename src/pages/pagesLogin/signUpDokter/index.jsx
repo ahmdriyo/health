@@ -24,6 +24,7 @@ import DropdownComponentExperience from "../../../components/DropdownExperience"
 import { firebase, userRef } from "../../../../config";
 import ImagePickers from "../../../components/ImagePicker";
 import { alertEmailDuplicate, alertRegSuccessful, fieldError, minimumPasswordError } from "../../../customAlert";
+import LoadingButton from "../../../components/LoadingButton";
 const SignUpDokter = ({navigation}) => {
   const [fullName, setFullName] = useState('');
   const [address, setAddress] = useState('');
@@ -32,6 +33,7 @@ const SignUpDokter = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState("dokter");
+  const [loading, setLoading] = useState(false);
   const [fontsLoaded] = useFonts({
     Raleway_600SemiBold,
     Raleway_700Bold,
@@ -66,6 +68,7 @@ const SignUpDokter = ({navigation}) => {
       minimumPasswordError();
       return;
     }
+    setLoading(true)
     try {
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       const userId = userCredential.user.uid;
@@ -75,16 +78,20 @@ const SignUpDokter = ({navigation}) => {
         spesialis,
         email,
         fullName,
-        role
+        role,
+        userId
       });
+      setLoading(false)
       navigation.navigate("Login");
       alertRegSuccessful();
       console.log("role anda :", role)
       console.log("id anda :", userId)
       console.log("Pendaftaran berhasil:",fullName,email, address,longExperience,spesialis);
     } catch (err) {
+      setLoading(false)
       if ( err.message === "Firebase: The email address is already in use by another account. (auth/email-already-in-use).") {
         alertEmailDuplicate();
+        setLoading(false)
         return;
       }
     }
@@ -113,7 +120,12 @@ const SignUpDokter = ({navigation}) => {
             <TextInputs placeholder="Email" onChangeText={(email) => setEmail(email)} />
             <InputPassword placeholder="Password" onChangeText={(password) => setPassword(password)} />
           </View>
-          <Buttons
+          {loading ? (
+            <View style={{width: '75%',height : 45,}}>
+              <LoadingButton/>
+            </View>
+          ):(
+            <Buttons
             label="Sign Up"
             color="#ffffff"
             bgColor="#432C81"
@@ -122,6 +134,7 @@ const SignUpDokter = ({navigation}) => {
               registerUser(email, password, fullName,address,spesialis,longExperience)}
             }
           />
+          )}
           <View style={{ flexDirection: "row" }}>
             <Text style={{ color: "#82799D", marginRight: 5 }}>
               Already have an account?

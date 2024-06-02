@@ -13,101 +13,89 @@ import HomeUser from "./pages/dashboard/homeUser";
 import HomeApoteker from "./pages/dashboard/homeApoteker";
 import ImagePickers from "./components/ImagePicker";
 import ChatRoom from "./pages/dashboard/homeUser/pesan/ChatRoom";
+import DetailArtikel from "./pages/dashboard/homeUser/artikel/DetailArtikel";
+import { useAuth } from "./Auth/authContext";
+import SplashScreen from "./pages/splashScreen";
 
 
 const Stack = createStackNavigator();
 function Main() {
-  
-  const [userRole, setUserRole] = useState("");
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userRole = await AsyncStorage.getItem('userData');
-        const { role } = JSON.parse(userRole);
-        setUserRole(role);
-      } catch (error) {
-        return(null)
-      }
-      
-    };
-    fetchData();
-  }, []);
-  console.log("userRole :",userRole)
-  if(userRole){
-    if(userRole === "user"){
-      return (
-        
-        <Stack.Navigator
-        screenOptions={{
-          animationEnabled: true,
-          cardStyleInterpolator: ({ current }) => ({
-            cardStyle: {
-              transform: [
-                {
-                  translateX: current.progress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [500, 0],
-                  }),
-                },
-              ],
-            },
-          }),
-        }}
-        >
-          <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
-          <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
-        </Stack.Navigator>
-      );
-    }else if(userRole === "dokter"){
-      return (
-        <Stack.Navigator
-        screenOptions={{
-          animationEnabled: true,
-          cardStyleInterpolator: ({ current }) => ({
-            cardStyle: {
-              transform: [
-                {
-                  translateX: current.progress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [500, 0],
-                  }),
-                },
-              ],
-            },
-          }),
-        }}
-        >
-          <Stack.Screen name="HomeDokter" component={HomeDokter} options={{ headerShown: false }}/>
-        </Stack.Navigator>
-      );
-    }else if(userRole === "apoteker"){
-      return (
-        <Stack.Navigator
-        screenOptions={{
-          animationEnabled: true,
-          cardStyleInterpolator: ({ current }) => ({
-            cardStyle: {
-              transform: [
-                {
-                  translateX: current.progress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [500, 0],
-                  }),
-                },
-              ],
-            },
-          }),
-        }}
-        >
-          <Stack.Screen name="HomeApoteker" component={HomeApoteker} options={{ headerShown: false }}/>
-        </Stack.Navigator>
-      );
-    }else{
-      return
-    }
+
+  // if(userRole){
+  //   if(userRole === "user"){
+  //     return (
+  //       <Stack.Navigator
+  //       screenOptions={{
+  //         animationEnabled: true,
+  //         cardStyleInterpolator: ({ current }) => ({
+  //           cardStyle: {
+  //             transform: [
+  //               {
+  //                 translateX: current.progress.interpolate({
+  //                   inputRange: [0, 1],
+  //                   outputRange: [500, 0],
+  //                 }),
+  //               },
+  //             ],
+  //           },
+  //         }),
+  //       }}
+  //       >
+  //         <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
+  //         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
+  //         <Stack.Screen name="DetailArtikel" component={DetailArtikel} options={{ headerShown: false }} />
+  //       </Stack.Navigator>
+  //     );
+  //   }else if(userRole === "dokter"){
+  //     return (
+  //       <Stack.Navigator
+  //       screenOptions={{
+  //         animationEnabled: true,
+  //         cardStyleInterpolator: ({ current }) => ({
+  //           cardStyle: {
+  //             transform: [
+  //               {
+  //                 translateX: current.progress.interpolate({
+  //                   inputRange: [0, 1],
+  //                   outputRange: [500, 0],
+  //                 }),
+  //               },
+  //             ],
+  //           },
+  //         }),
+  //       }}
+  //       >
+  //         <Stack.Screen name="HomeDokter" component={HomeDokter} options={{ headerShown: false }}/>
+  //       </Stack.Navigator>
+  //     );
+  //   }else if(userRole === "apoteker"){
+  //     return (
+  //       <Stack.Navigator
+  //       screenOptions={{
+  //         animationEnabled: true,
+  //         cardStyleInterpolator: ({ current }) => ({
+  //           cardStyle: {
+  //             transform: [
+  //               {
+  //                 translateX: current.progress.interpolate({
+  //                   inputRange: [0, 1],
+  //                   outputRange: [500, 0],
+  //                 }),
+  //               },
+  //             ],
+  //           },
+  //         }),
+  //       }}
+  //       >
+  //         <Stack.Screen name="HomeApoteker" component={HomeApoteker} options={{ headerShown: false }}/>
+  //       </Stack.Navigator>
+  //     );
+  //   }else{
+  //     return
+  //   }
 
 
-  }else{
+  // }else{
     return (
       <Stack.Navigator
       screenOptions={{
@@ -126,7 +114,7 @@ function Main() {
         }),
       }}
       >
-        
+        <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}/>
         <Stack.Screen name="ImagePickers" component={ImagePickers} options={{ headerShown: false }}/>
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
@@ -138,11 +126,9 @@ function Main() {
         <Stack.Screen name="HomeDokter" component={HomeDokter} options={{ headerShown: false }}/>
         <Stack.Screen name="HomeApoteker" component={HomeApoteker} options={{ headerShown: false }}/>
         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }}/>
-        
+        <Stack.Screen name="DetailArtikel" component={DetailArtikel} options={{ headerShown: false }}/>
       </Stack.Navigator>
     );
   }
-  
-}
 
 export default Main;

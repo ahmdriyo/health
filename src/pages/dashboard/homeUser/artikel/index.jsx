@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, ScrollView, Image, ImageBackground,StyleSheet,Dimensions, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, ScrollView, Image, ImageBackground,StyleSheet,Dimensions, TextInput, Linking,TouchableOpacity } from "react-native";
 import { bgHeader } from "../../../../assets";
 import SvgProfile from "../../../../assets/Image/Icon/Profile";
 import LoadingButton from "../../../../components/LoadingButton";
 
-export default function App() {
+export default function App({navigation}) {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,13 +50,14 @@ export default function App() {
       setFilteredData(filtered);
     }
   };
-
-
+  const handlePress = (selectedItem) => {
+    navigation.navigate("DetailArtikel" , { selectedItem })
+    // Di sini Anda dapat melakukan apa pun dengan data yang dipilih, misalnya menavigasi ke halaman detail
+  }
   return (
-<View style={{ flex: 1 }}>
-  <View style={{ flex: 1, height: 580, width: 420 }}>
-  
+  <View style={styles.container}>
     <FlatList
+    style={{marginBottom:80}}
       ListHeaderComponent={
         <ImageBackground source={bgHeader} style={styles.headerImg}>
           <View style={styles.viewHeader}>
@@ -73,39 +74,42 @@ export default function App() {
             </View>
           </View>
         </ImageBackground>
-      } // Tambahkan komponen teks di sini
+      }
       data={filteredData}
       renderItem={({ item }) => (
-      <TouchableOpacity>
-        <View style={{flex:1,justifyContent:"center",alignContent:'center',alignItems:'center'}}>
-        <View style={{width:380,backgroundColor:"#ffffff",marginVertical:5,flexDirection:'row',borderRadius:10,borderWidth:0.5,borderColor:"#b4b4ba",marginLeft:-10 }}>
+      <TouchableOpacity
+      onPress={() => handlePress(item)}
+      >
+        <View style={styles.containerContent}>
+        <View style={styles.content}>
           <View style={{width: 230,padding:20}}>
-            <Text style={{ fontWeight: "bold" }}>Penulis: {item.author}</Text>
-            <Text style={{fontSize:13}}>{truncateText(item.description, 130)}</Text>
+            <Text style={{ fontWeight: "bold" }}>Creator: {item.author}</Text>
+            <Text style={{fontSize:13}}>{truncateText(item.title, 130)}</Text>
           </View>
-          <View style={{justifyContent:"center",margin:10,marginLeft:20}}>
-            <Image style={{ width:110,height: 110,borderRadius:5}} source={{ uri: item.urlToImage }}/>
+          <View style={styles.contentImage}>
+            <Image style={styles.styleImage} source={{ uri: item.urlToImage }}/>
           </View>
-          {/* <Text>Link {item.url}</Text> */}
         </View>
         </View>
       </TouchableOpacity>
       )}
       keyExtractor={(item, index) => index.toString()}
     />
-    <View style={{position:'absolute',top:"50%",left:'45%'}}>
+    <View style={styles.styleLoding}>
       {refreshing && <LoadingButton />}
     </View>
   </View>
-</View>
-
-
   );
 }
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+    height: 580,
+    width: 420
+  },
   headerImg: {
     width: width,
     height: height - 560,
@@ -136,5 +140,36 @@ const styles = StyleSheet.create({
     paddingLeft:20,
     alignContent:'center',
     justifyContent:'center'
-  } 
+  },
+  containerContent:{
+    flex:1,
+    justifyContent:"center",
+    alignContent:'center',
+    alignItems:'center'
+  },
+  content:{
+    width:380,
+    backgroundColor:"#ffffff",
+    marginVertical:5,
+    flexDirection:'row',
+    borderRadius:10,
+    borderWidth:0.5,
+    borderColor:"#b4b4ba",
+    marginLeft:-10
+  },
+  contentImage:{
+    justifyContent:"center",
+    margin:10,
+    marginLeft:20
+  },
+  styleImage:{
+    width:110,
+    height: 110,
+    borderRadius:5
+  },
+  styleLoding:{
+    position:'absolute',
+    top:"50%",
+    left:'45%',
+  }
 });

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
@@ -18,23 +18,26 @@ import {
   Raleway_700Bold,
 } from "@expo-google-fonts/raleway";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firebase, userRef } from "../../../../config";
+import { userRef } from "../../../../config";
 import Buttons from "../../../components/Button/Index";
 import TextInputs from "../../../components/TextInput";
 import InputPassword from "../../../components/InputPassword";
 import { alertInvalidCredential, fieldError, invalidEmailError,minimumPasswordError} from "../../../customAlert";
+import { useAuth } from "../../../Auth/authContext";
+import { getDoc, getDocs, query, where } from "firebase/firestore";
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState(null);
   const [role, setRole] = useState('')
-
+  const {user,login} = useAuth();
+  const [users, setUsers] = useState([''])
 
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
   const loginUsers = async () => {
     if (!email || !password) {
       fieldError();
@@ -48,41 +51,24 @@ const Login = ({ navigation }) => {
       minimumPasswordError();
       return;
     }
+    setLoading(true);
     try {
-      const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-      setLoading(true)
-      const userId = userCredential.user.uid;
-      const userDoc = await userRef.doc(userId).get();
-      console.log("userDoc :",userDoc)
-      if (userDoc.exists) {
-        const userData = userDoc.data();
-        setUserData(userData);
-        AsyncStorage.setItem('userData', JSON.stringify(userData));
-        navigateOnRole();
-      } else {
-        console.log("Data pengguna tidak ditemukan");
+      const response = await login(email, password);
+      setLoading(false);
+      if (!response.success) {
+        Alert.alert("Login", response.msg);
+        return;
       }
-      console.log("Login berhasil");
+      const userData = response.user;
+      if (userData?.role === "user") {
+        console.log("userData",userData)
+        navigation.navigate("HomeUser");
+      }
+
     } catch (err) {
       if (err.message === "Firebase: The supplied auth credential is incorrect, malformed or has expired. (auth/invalid-credential).") {
         alertInvalidCredential()
       }
-    }
-  };
-  navigateOnRole = async () => {
-    try {
-      const userRole = await AsyncStorage.getItem('userData');
-      const { role } = JSON.parse(userRole);
-      console.log("userRole", userRole);
-      if (role === 'dokter') {
-        navigation.navigate("HomeDokter");
-      } else if (role === 'user') {
-        navigation.navigate("HomeUser");
-      } else if (role === 'apoteker') {
-        navigation.navigate("HomeApoteker");
-      } 
-    } catch (error) {
-      console.error('Error navigating user based on role:', error);
     }
   };
   const [fontsLoaded] = useFonts({
@@ -94,7 +80,6 @@ const Login = ({ navigation }) => {
   }
   return (
     <SafeAreaView style={styles.container}>
-      {/* <StatusBar barStyle = "whait-content" hidden = {false} backgroundColor="transparent" translucent = {true}/> */}
       <StatusBar
         barStyle="dark-content"
         hidden={false}

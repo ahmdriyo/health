@@ -88,6 +88,7 @@ const SignUpApoteker = ({ navigation }) => {
         email,
         fullName,
         role,
+        userId
       });
       navigation.navigate("Login");
       alertRegSuccessful();
@@ -99,7 +100,7 @@ const SignUpApoteker = ({ navigation }) => {
         email,
         address,
         longExperience,
-        spesialis
+        spesialis,
       );
     } catch (err) {
       if (
