@@ -9,73 +9,31 @@ import {
   ActivityIndicator,
 
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-import { firebase } from "../../../../../config";
-import Buttons from "../../../../components/Button/Index";
-import * as Updates from "expo-updates";
+
 import { getDocs, query, where } from 'firebase/firestore';
 import { userRef } from "../../../../../config";
 import { useAuth } from "../../../../Auth/authContext";
 import ChatList from "./ChatList";
 const Pesan = ({ navigation }) => {
-//   const [name, setName] = useState(null);
-//   useEffect(() => {
-//     const fetchUserData = async () => {
-//         try {
-//           const getData = await AsyncStorage.getItem('userData');
-//           const { fullName } = JSON.parse(getData);
-//           setName(fullName);
-//         } catch (error) {
-//           console.error("Error fetching user data:", error);
-//         }
-//       } 
-//     fetchUserData();
-//   }, []);
-//   console.log("name : ", name);
-
-//   const handleLogout = async () => {
-//     try {
-//       await firebase.auth().signOut();
-//       await AsyncStorage.removeItem('userData');
-//       setName(null)
-//       await Updates.reloadAsync();
-//       console.log("Logut User Berhasil")
-//     } catch (error) {
-//       console.error("Error during logout:", error);
-//     }
-//   };
-//   return (
-//     <SafeAreaView style={{ flex: 1 }}>
-//       <Text>Nama Pengguna: {name}</Text>
-//       <Text>User {name}</Text>
-//       <TouchableOpacity onPress={handleLogout}>
-//         <Text>logout</Text>
-//       </TouchableOpacity>
-//     </SafeAreaView>
-//   );
-// };
 const {logout,user} = useAuth();
 const [users, setUsers] = useState([''])
 useEffect(() => {
   if (user?.userId) {
     getUsers();
   }
-  console.log("user data", user);
+  // console.log("user data", user);
 }, []);
-
 const getUsers = async () => {
   const q = query(userRef, where('userId', '!=',user?.userId))
-
   const querySnapshot = await getDocs(q);
   let data = [];
   querySnapshot.forEach(doc => {
     data.push({...doc.data()})
   });
   setUsers(data)
-  console.log("data GetUser",data)
+  // console.log("data GetUser",data)
 }
-// const nama = user.username;
 return (
   <View style={{flex:1,backgroundColor:"white"}}>
     <StatusBar style="light" />

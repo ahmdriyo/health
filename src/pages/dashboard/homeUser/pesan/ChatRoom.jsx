@@ -21,7 +21,7 @@ import {getRoomId} from "../../../../../utils/cummon"
 import { Timestamp, addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
 import { db } from "../../../../../config";
 import { useNavigation, useRoute } from "@react-navigation/native";
-const ChatRoom = () => {
+const ChatRoom = ({}) => {
   const route = useRoute();
   const navigation = useNavigation();
   const { user } = useAuth();
@@ -36,9 +36,9 @@ const ChatRoom = () => {
   useEffect(() => {
       createRoomIfNoExists();
       let roomId = getRoomId(user?.userId, route.params.userId);
-      console.log("UserId:", user?.userId);
-      console.log("router id:", route.params.userId);
-      console.log("room id", roomId);
+      // console.log("UserId:", user?.userId);
+      // console.log("router id:", route.params.userId);
+      // console.log("room id", roomId);
       const docRef = doc(db, "rooms", roomId);
       const messagesRef = collection(docRef, "messages");
       const q = query(messagesRef, orderBy('createdAt', 'asc'));
@@ -100,8 +100,7 @@ const ChatRoom = () => {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" hidden={false} />
-      <Text>eeeeeeeeeee</Text>
-      {/* <ChatRoomHeader user={item} onBack={handleGoBack} /> */}
+      <ChatRoomHeader user={route.params.userId.fullName} onBack={handleGoBack} />
       <View style={{ flex: 1 }}>
         <View>
           <MessageList user={route.params.userId} scrollViewRef={scrollViewRef} messages={messages} currentUser={user}/>

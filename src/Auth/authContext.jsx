@@ -6,17 +6,17 @@ import { auth,db, userRef } from "../../config";
 export const  AuthContext = createContext ();
 export const AuthContextProvider = ({children}) => {
   const [user, setUser] = useState(null)
-  // const [isAuthenticated,setIsAuthenticated] = useState(undefined)
+  const [isAuthenticated,setIsAuthenticated] = useState(undefined)
 
   useEffect(() => {
       const unsub = onAuthStateChanged(auth, (user) => {
         // console.log('got user :' ,user)
         if(user) {
-          // setIsAuthenticated(true);
+          setIsAuthenticated(true);
           setUser(user)
           updateUserData(user.uid);
         }else{
-          // setIsAuthenticated(false)
+          setIsAuthenticated(false)
           setUser(null)
         }
       })
@@ -69,7 +69,6 @@ export const AuthContextProvider = ({children}) => {
   const register = async (email,password,fullName,role) => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email,password);
-
       await setDoc(doc(db, "users", response?.user?.uid),{
         email,
         fullName,
@@ -86,9 +85,53 @@ export const AuthContextProvider = ({children}) => {
       return {success : false, msg};
     }
   }
+  const registerDokter = async (email,password,fullName,role,fullAddress,spesialis,longExperience) => {
+    try {
+      const response = await createUserWithEmailAndPassword(auth, email,password);
+      await setDoc(doc(db, "users", response?.user?.uid),{
+        email,
+        fullName,
+        role,
+        fullAddress,
+        spesialis,
+        longExperience,
+        userId : response?.user?.uid
+      });
+      return { success : true, data: response?.user};
+      
+    } catch (e) {
+      let msg = e.message;
+      if(msg.includes('(auth/invalid-email)')) msg ="Invalid email";
+      if(msg.includes('(auth/email-already-in-use)')) msg ="email Sudah Tersedia";
+      if(msg.includes('(auth/weak-password)')) msg ="Password Minimal 6 Karakter";
+      return {success : false, msg};
+    }
+  }
+  const registerApoteker = async (email,password,fullName,role,fullAddress,spesialis,longExperience) => {
+    try {
+      const response = await createUserWithEmailAndPassword(auth, email,password);
+      await setDoc(doc(db, "users", response?.user?.uid),{
+        email,
+        fullName,
+        role,
+        fullAddress,
+        spesialis,
+        longExperience,
+        userId : response?.user?.uid
+      });
+      return { success : true, data: response?.user};
+      
+    } catch (e) {
+      let msg = e.message;
+      if(msg.includes('(auth/invalid-email)')) msg ="Invalid email";
+      if(msg.includes('(auth/email-already-in-use)')) msg ="email Sudah Tersedia";
+      if(msg.includes('(auth/weak-password)')) msg ="Password Minimal 6 Karakter";
+      return {success : false, msg};
+    }
+  }
 
   return (
-    <AuthContext.Provider value={{user,login,logout,register}}>
+    <AuthContext.Provider value={{user,isAuthenticated,login,logout,register,registerDokter,registerApoteker}}>
       {children}
     </AuthContext.Provider>
   )

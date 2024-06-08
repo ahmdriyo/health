@@ -11,19 +11,16 @@ import { useNavigation } from "@react-navigation/native";
 import { Splash } from "../../assets";
 
 const SplashScreen = () => {
-  const { user } = useAuth();
+  const {isAuthenticated } = useAuth();
   const navigation = useNavigation();
 
   useEffect(() => {
-    if (user?.userId) {
-      if (user?.role === "user") {
-        navigation.navigate("HomeUser");
-      }
-      // console.log("ini data users", user.role);
-    }else{
+    if(isAuthenticated) {
+      navigation.navigate("HomeUser");
+    } else if (isAuthenticated == false) {
       navigation.navigate("SignIn");
     }
-  }, [user?.userId]);
+  }, [isAuthenticated]);
 
   return (
     <View style={{ flex: 1 }}>

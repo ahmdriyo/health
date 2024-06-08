@@ -16,86 +16,12 @@ import ChatRoom from "./pages/dashboard/homeUser/pesan/ChatRoom";
 import DetailArtikel from "./pages/dashboard/homeUser/artikel/DetailArtikel";
 import { useAuth } from "./Auth/authContext";
 import SplashScreen from "./pages/splashScreen";
+import { useNavigation } from "@react-navigation/native";
+import Profile from "./pages/dashboard/homeUser/beranda/Profile";
 
 
 const Stack = createStackNavigator();
 function Main() {
-
-  // if(userRole){
-  //   if(userRole === "user"){
-  //     return (
-  //       <Stack.Navigator
-  //       screenOptions={{
-  //         animationEnabled: true,
-  //         cardStyleInterpolator: ({ current }) => ({
-  //           cardStyle: {
-  //             transform: [
-  //               {
-  //                 translateX: current.progress.interpolate({
-  //                   inputRange: [0, 1],
-  //                   outputRange: [500, 0],
-  //                 }),
-  //               },
-  //             ],
-  //           },
-  //         }),
-  //       }}
-  //       >
-  //         <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
-  //         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }} />
-  //         <Stack.Screen name="DetailArtikel" component={DetailArtikel} options={{ headerShown: false }} />
-  //       </Stack.Navigator>
-  //     );
-  //   }else if(userRole === "dokter"){
-  //     return (
-  //       <Stack.Navigator
-  //       screenOptions={{
-  //         animationEnabled: true,
-  //         cardStyleInterpolator: ({ current }) => ({
-  //           cardStyle: {
-  //             transform: [
-  //               {
-  //                 translateX: current.progress.interpolate({
-  //                   inputRange: [0, 1],
-  //                   outputRange: [500, 0],
-  //                 }),
-  //               },
-  //             ],
-  //           },
-  //         }),
-  //       }}
-  //       >
-  //         <Stack.Screen name="HomeDokter" component={HomeDokter} options={{ headerShown: false }}/>
-  //       </Stack.Navigator>
-  //     );
-  //   }else if(userRole === "apoteker"){
-  //     return (
-  //       <Stack.Navigator
-  //       screenOptions={{
-  //         animationEnabled: true,
-  //         cardStyleInterpolator: ({ current }) => ({
-  //           cardStyle: {
-  //             transform: [
-  //               {
-  //                 translateX: current.progress.interpolate({
-  //                   inputRange: [0, 1],
-  //                   outputRange: [500, 0],
-  //                 }),
-  //               },
-  //             ],
-  //           },
-  //         }),
-  //       }}
-  //       >
-  //         <Stack.Screen name="HomeApoteker" component={HomeApoteker} options={{ headerShown: false }}/>
-  //       </Stack.Navigator>
-  //     );
-  //   }else{
-  //     return
-  //   }
-
-
-  // }else{
     return (
       <Stack.Navigator
       screenOptions={{
@@ -115,6 +41,8 @@ function Main() {
       }}
       >
         <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
+        <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
         <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }}/>
         <Stack.Screen name="ImagePickers" component={ImagePickers} options={{ headerShown: false }}/>
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }}/>
@@ -122,7 +50,6 @@ function Main() {
         <Stack.Screen name="SignUpUser" component={SignUpUser} options={{ headerShown: false }}/>
         <Stack.Screen name="SignUpApoteker" component={SignUpApoteker} options={{ headerShown: false }}/>
         <Stack.Screen name="SignUpDokter" component={SignUpDokter} options={{ headerShown: false }} />
-        <Stack.Screen name="HomeUser" component={HomeUser} options={{ headerShown: false }} />
         <Stack.Screen name="HomeDokter" component={HomeDokter} options={{ headerShown: false }}/>
         <Stack.Screen name="HomeApoteker" component={HomeApoteker} options={{ headerShown: false }}/>
         <Stack.Screen name="ChatRoom" component={ChatRoom} options={{ headerShown: false }}/>

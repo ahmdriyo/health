@@ -28,7 +28,7 @@ import {
 import LoadingButton from "../../../components/LoadingButton";
 import { useAuth } from "../../../Auth/authContext";
 import { userRef } from "../../../../config";
-import { getDocs, query, where } from "firebase/firestore";
+import { getDocs } from "firebase/firestore";
 
 const SignUpUser = ({ navigation }) => {
   const [password, setPassword] = useState();
@@ -36,7 +36,7 @@ const SignUpUser = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState();
   const [role, setRole] = useState("user");
-  const {logout,user,register} = useAuth();
+  const {user,register} = useAuth();
   const [users, setUsers] = useState([''])
 
   const isValidEmail = (email) => {
@@ -70,10 +70,6 @@ const SignUpUser = ({ navigation }) => {
       }
       await getUsers();
       console.log("role anda :", role);
-      if (role === "user") {
-        navigation.navigate("HomeUser");
-      }
-
     } catch (err) {
       setLoading(false);
       if (err.message === "Firebase: The email address is already in use by another account. (auth/email-already-in-use).") {
@@ -85,12 +81,14 @@ const SignUpUser = ({ navigation }) => {
   };
   const getUsers = async () => {
     try {
-      const q = query(userRef, where('userId', '!=', user?.uid));
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(userRef);
       let data = [];
-      console.log("query", q);
+      console.log("querySnapshot", querySnapshot);
       querySnapshot.forEach(doc => {
-        data.push({ ...doc.data() });
+        const userData = doc.data();
+        if (userData.userId !== user?.uid) {
+          data.push(userData);
+        }
       });
       setUsers(data);
       console.log("user", data);
@@ -98,6 +96,11 @@ const SignUpUser = ({ navigation }) => {
       console.error('Error fetching users:', error);
     }
   }
+  useEffect(() => {
+    if (user && user.uid) {
+      getUsers();
+    }
+  }, [user]); 
 
   const [fontsLoaded] = useFonts({
     Raleway_600SemiBold,

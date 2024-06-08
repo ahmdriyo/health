@@ -8,7 +8,7 @@ import {
   Alert,
   Dimensions
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import SvgLogin from "../../../assets/SvgLogin";
@@ -21,10 +21,10 @@ import TextInputs from "../../../components/TextInput";
 import InputPassword from "../../../components/InputPassword";
 import DropdownComponentSpesialis from "../../../components/DropdownSpesialis";
 import DropdownComponentExperience from "../../../components/DropdownExperience";
-import { firebase, userRef } from "../../../../config";
-import ImagePickers from "../../../components/ImagePicker";
-import { alertEmailDuplicate, alertRegSuccessful, fieldError, minimumPasswordError } from "../../../customAlert";
+import { userRef } from "../../../../config";
+import { alertEmailDuplicate, fieldError, minimumPasswordError } from "../../../customAlert";
 import LoadingButton from "../../../components/LoadingButton";
+import { useAuth } from "../../../Auth/authContext";
 const SignUpDokter = ({navigation}) => {
   const [fullName, setFullName] = useState('');
   const [address, setAddress] = useState('');
@@ -34,6 +34,8 @@ const SignUpDokter = ({navigation}) => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState("dokter");
   const [loading, setLoading] = useState(false);
+  const { registerDokter,user } = useAuth();
+  const [users, setUsers] = useState([''])
   const [fontsLoaded] = useFonts({
     Raleway_600SemiBold,
     Raleway_700Bold,
@@ -51,7 +53,7 @@ const SignUpDokter = ({navigation}) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-  const registerUser = async (email, password, fullName,address,longExperience,spesialis) => {
+  const handleRegisterDokters = async (email, password, fullName,address,longExperience,spesialis) => {
     if(fullName == ""){
       nameError();
       return;
@@ -70,23 +72,13 @@ const SignUpDokter = ({navigation}) => {
     }
     setLoading(true)
     try {
-      const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-      const userId = userCredential.user.uid;
-      await userRef.doc(userId).set({
-        address,
-        longExperience,
-        spesialis,
-        email,
-        fullName,
-        role,
-        userId
-      });
-      setLoading(false)
-      navigation.navigate("Login");
-      alertRegSuccessful();
-      console.log("role anda :", role)
-      console.log("id anda :", userId)
-      console.log("Pendaftaran berhasil:",fullName,email, address,longExperience,spesialis);
+      let response = await registerDokter(email, password, fullName, role,address,longExperience,spesialis);
+      setLoading(false);
+      if (!response.success) {
+        Alert.alert("Sign Up", response.msg);
+        return;
+      }
+      await getUsers();
     } catch (err) {
       setLoading(false)
       if ( err.message === "Firebase: The email address is already in use by another account. (auth/email-already-in-use).") {
@@ -96,6 +88,27 @@ const SignUpDokter = ({navigation}) => {
       }
     }
   };
+  const getUsers = async () => {
+    try {
+      const querySnapshot = await getDocs(userRef);
+      let data = [];
+      console.log("querySnapshot", querySnapshot);
+      querySnapshot.forEach(doc => {
+        const userData = doc.data();
+        if (userData.userId !== user?.uid) {
+          data.push(userData);
+        }
+      });
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+  useEffect(() => {
+    if (user && user.uid) {
+      getUsers();
+    }
+  }, [user]); 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
@@ -131,7 +144,7 @@ const SignUpDokter = ({navigation}) => {
             bgColor="#432C81"
             fontFamily="Raleway_700Bold"
             onPress={() => {
-              registerUser(email, password, fullName,address,spesialis,longExperience)}
+              handleRegisterDokters(email, password, fullName,address,spesialis,longExperience)}
             }
           />
           )}

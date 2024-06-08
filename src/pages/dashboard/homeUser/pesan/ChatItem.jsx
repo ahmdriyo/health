@@ -18,7 +18,7 @@ import { icon } from "../../../../assets";
 const ChatItem = ({ item, navigation, currentUser }) => {
   const [lastMessage, setLastMessage] = useState(undefined);
   const openChatRoom = () => {
-    navigation.navigate("ChatRoom", {  userId: item.userId });
+    navigation.navigate("ChatRoom", {  userId: item });
   };
 
   useEffect(() => {
@@ -56,18 +56,22 @@ const ChatItem = ({ item, navigation, currentUser }) => {
     if (lastMessage) {
       let messageText = lastMessage.text;
       if (messageText.length > maxLength) {
+        console.log("1")
+
         // Potong teks pesan jika melebihi panjang maksimum
         messageText = messageText.slice(0, maxLength) + "...";
       }
       if (currentUser?.userId == lastMessage?.userId)
+        console.log("2")
         return "Anda: " + messageText;
       return messageText;
     } else {
+      console.log("Gak ada")
       return "Say hi";
     }
   };
 
-  // console.log("renderLastMessage : ", renderLastMessage());
+  console.log("renderLastMessage : ", renderLastMessage());
   // console.log("lastMessage : ", lastMessage);
   // console.log("currentUser : ", currentUser);
   // console.log("item",item)

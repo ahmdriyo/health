@@ -9,7 +9,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const ChatRoomHeader = ({ user, onBack }) => {
-  // console.log("user",user)
   const Stack = createStackNavigator();
   useEffect(() => {
     console.log("ini user chat",user)
@@ -21,8 +20,8 @@ const ChatRoomHeader = ({ user, onBack }) => {
           alignItems: "center",
           flexDirection: "row",
           justifyContent: "space-between",
-          borderBottomWidth: 1,
-          borderTopWidth: 1,
+          borderBottomWidth: 0.2,
+          borderTopWidth: 0.2,
           paddingHorizontal: 10,
           width: "100%",
           height: 70,
@@ -32,7 +31,7 @@ const ChatRoomHeader = ({ user, onBack }) => {
           <TouchableOpacity onPress={onBack}>
             <Entypo name="chevron-left" size={hp(5)} color="#737373" />
           </TouchableOpacity>
-        <Text style={{marginLeft:10,fontWeight:'bold'}}>MAlok</Text>
+        <Text style={{marginLeft:10,fontWeight:'bold'}}>{user}</Text>
         </View>
         <View style={{ flexDirection: "row", gap: 25, marginHorizontal: 5 }}>
           <Ionicons name="call" size={hp(3)} color="#373737" />

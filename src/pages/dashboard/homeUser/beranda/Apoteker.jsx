@@ -6,50 +6,43 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getDocs, query, where } from 'firebase/firestore';
-import { userRef } from "../../../../../config";
-import { useAuth } from "../../../../Auth/authContext";
 import LoadingButton from "../../../../components/LoadingButton";
-
+import { useAuth } from "../../../../Auth/authContext";
+import { getDocs, query, where } from "firebase/firestore";
+import { userRef } from "../../../../../config";
+import ChatListApoteker from "../../../../components/ChatListApoteker";
 const Apoteker = ({navigation}) => {
-  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const auth = useAuth();
-
+  const { user } = useAuth();
+  const [users, setUsers] = useState([''])
   useEffect(() => {
-    const getUsers = async () => {
-      try {
-        const querySnapshot = await getDocs(userRef);
-        const usersData = querySnapshot.docs.map((doc) => doc.data());
-        setUsers(usersData);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching users: ", error);
-      }
-    };
+    if (user?.userId) {
+      setLoading(true)
+      getUsers();
+    }
+    console.log("user data apoek", user);
+  }, [user?.userId]);
+  const getUsers = async () => {
+    const q = query(userRef, where('userId', '!=',user?.userId))
+    const querySnapshot = await getDocs(q);
+    let data = [];
+    querySnapshot.forEach(doc => {
+      data.push({...doc.data()})
+    });
+    setUsers(data)
+    setLoading(false);
+    // console.log("data GetUser apotek",data)
+  }
 
-    getUsers();
-  }, []);
   const openChatRoom = () => {
     navigation.navigate("Pesan");
   };
-  // const filteredUsers = users.filter(user => user.role && user.role === 'apoteker');
-
-  // console.log("user", users);
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff", height: 900 }}>
       {loading ? (
         <LoadingButton/>
       ):(
-        <ScrollView>
-        {users.map((user, index) => (
-          <TouchableOpacity key={index} onPress={() => {openChatRoom()}}>
-            <Text>{user.fullName}</Text>
-            {/* <Text>{user.longExperience.label}</Text> */}
-            {/* <Text>{user.spesialis.label}</Text> */}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+        <ChatListApoteker currentUser={user} users={users}/>
       )}
       
     </View>

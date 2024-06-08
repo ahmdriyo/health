@@ -22,7 +22,7 @@ const InputPassword = ({ placeholder,onChangeText,keyboardType,value }) => {
         placeholderTextColor='#7B6BA8'
       />
       <TouchableOpacity style={styles.iconContainer} onPress={togglePasswordVisibility}>
-        <MaterialCommunityIcons name={passwordVisible ? 'eye-off' : 'eye'} size={24} color="#C0BBFF" />
+        <MaterialCommunityIcons name={passwordVisible ? 'eye':'eye-off' } size={24} color="#C0BBFF" />
       </TouchableOpacity>
     </View>
   );

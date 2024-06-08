@@ -9,6 +9,7 @@ import {
   Dimensions,
   Image,
   ImageBackground,
+  TouchableOpacity,
 } from "react-native";
 import { useFonts } from "expo-font";
 import {
@@ -16,20 +17,22 @@ import {
   Raleway_700Bold,
 } from "@expo-google-fonts/raleway";
 import * as Location from "expo-location";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import SvgIconHealth from "../../../../assets/Image/Icon/IconHealth";
 import SvgProfile from "../../../../assets/Image/Icon/Profile";
 import { bgHeader } from "../../../../assets";
-import SvgHeart from "../../../../assets/Image/Icon/SvgHeart";
 import Conten from "./Conten";
 import { useAuth } from "../../../../Auth/authContext";
+import ContenHome from "../../../../components/ContenHome";
+import { useNavigation } from "@react-navigation/native";
+
 export default function Beranda () {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [city, setCity] = useState(null);
-  const [name, setName] = useState(null);
   const { user } = useAuth();
+  const navigation = useNavigation();
+
 
   useEffect(() => {
     (async () => {
@@ -61,6 +64,10 @@ export default function Beranda () {
     }
   }, [location]);
 
+  const handlePorfile = () => {
+    navigation.navigate("Profile")
+  }
+ 
   let text = (
     <>
       <ActivityIndicator style={{ margin: 8 }} size="small" color="#432C81" />
@@ -100,9 +107,11 @@ export default function Beranda () {
               <Text style={styles.text}>Health Fit</Text>
             </View>
             <View style={{ flexDirection: "row" }}>
-              <View style={{ marginHorizontal: 5 }}>
-                <SvgProfile width={45} height={45} />
-              </View>
+              <TouchableOpacity onPress={handlePorfile}>
+                <View style={{ marginHorizontal: 5 }}>
+                  <SvgProfile width={49} height={45} />
+                </View>
+              </TouchableOpacity>
               <View
                 style={{
                   flexDirection: "column",
@@ -110,14 +119,14 @@ export default function Beranda () {
                   marginRight: 5,
                 }}
               >
-                <Text style={styles.textName}>{user.fullName}</Text>
+                <Text style={styles.textName}>{user?.fullName}</Text>
                 <Text style={styles.textCity}>{text}</Text>
               </View>
             </View>
           </View>
         </View>
       </ImageBackground>
-      <Conten/>
+      <ContenHome/>
     </View>
   );
 }

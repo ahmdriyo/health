@@ -23,31 +23,13 @@ import { useAuth } from "../../../Auth/authContext";
 
 const BottomTabNavigator = createBottomTabNavigator();
 
-const HomeUser = ({ navigation }) => {
-  const [loading, setLoading] = useState(true);
-
-  const {logout,user} = useAuth();
-  const [users, setUsers] = useState([''])
-  useEffect(() => {
-    console.log("User cek",user)
-    if(user?.uid)
-    getUsers()
-  },[])
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+const HomeUser = () => {
   return (
     <SafeAreaView style={{flex:1}}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="#F9F8F8"
       />
-      {loading ? (
-        <Loading/>
-      ) : (
         <BottomTabNavigator.Navigator
         screenOptions={{
           tabBarLabelStyle: styles.label,
@@ -111,9 +93,7 @@ const HomeUser = ({ navigation }) => {
             ),
           }}
         />
-      </BottomTabNavigator.Navigator>
-      )}
-      
+      </BottomTabNavigator.Navigator>      
     </SafeAreaView>
   );
 };
